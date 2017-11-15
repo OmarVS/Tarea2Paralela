@@ -1,2 +1,2 @@
-# Tarea2Paralela
-Tarea 2 de ayudantía. Computación Paralela
+# Tarea3AyudantiaParalela
+Tarea 3 triángulos de ayudantía, Computación Paralela
