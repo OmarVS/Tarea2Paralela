@@ -28,14 +28,31 @@ typedef struct
 punto coordenada[5000];
 triangulo triangulos[9665];
 
-float distancia_xy (float x, float y)
+float distancia_xy (punto p, punto q)
 {
-  return sqrt(pow(x,2)+pow(y,2));
+  return sqrt(pow((q.x - p.x),2)+pow((q.y - p.y),2));
 }
 
-punto buscar_punto(int indice, punto coordenada[])
+punto buscar_punto(int indice)
 {
-  return coordenada[indice];
+  return coordenada[indice-1];
+}
+
+float calcular_perimetro(triangulo t)
+{
+  punto puntos[3];
+  float distancia[3];
+
+  puntos[0] = buscar_punto(t.a);
+  puntos[1] = buscar_punto(t.b);
+  puntos[2] = buscar_punto(t.c);
+
+  distancia[0] = distancia_xy(puntos[0], puntos[1]);
+  distancia[1] = distancia_xy(puntos[1], puntos[2]);
+  distancia[2] = distancia_xy(puntos[0], puntos[2]);
+
+  return distancia[0] + distancia[1] + distancia[2];
+
 }
 
 int leer_triangulo(cadena archivo){
@@ -50,15 +67,14 @@ int leer_triangulo(cadena archivo){
            	while(!fs.eof())
 	        {
               int cont2=0;
-           		cont++;
+              //cont++;
            		fs.getline(string,30,'\n');
            		//cout<<"Dato sin separar: "<<string<<endl;
            		ptr = strtok(string," ");
            		while(ptr != NULL)
                    {
-
                     //cout <<"Dato separado:"<< ptr << endl;
-                    int d=atoi(ptr);
+                    int d=atof(ptr);
                     //cout <<"Dato separado en FLOAT:"<< d << endl;
                     if (cont2==0){
                     triangulos[cont].a = d;
@@ -72,7 +88,9 @@ int leer_triangulo(cadena archivo){
                     ptr = strtok(NULL, " ");
                     cont2++;
                    }
+                		cont++;
            	}
+            cout<<"triangulo a:"<<triangulos[1].a<<endl;
             return cont-1;
         }
 }
@@ -90,7 +108,7 @@ int leer_coordenadas(cadena archivo)
            	while(!fs.eof())
 	        {
               int cont2=0;
-           		cont++;
+           		//cont++;
            		fs.getline(string,30,'\n');
            		//cout<<"Dato sin separar: "<<string<<endl;
            		ptr = strtok(string," ");
@@ -109,14 +127,11 @@ int leer_coordenadas(cadena archivo)
                     ptr = strtok(NULL, " ");
                     cont2++;
                    }
+                   cont++;
            	}
-
            	return cont-1;
         }
-
 }
-
-
 
 int main(int argc, char *argv[])
 {
@@ -124,11 +139,9 @@ int main(int argc, char *argv[])
     if(argc<2)    cout<<"Ingrese la ruta del archivo como argumento. Ejemplo: \"./tarea1 numeros.csv\""<<endl;
     else{
     	cout<<"el archivo tiene: "<<leer_coordenadas(argv[1])<<" lineas"<<endl;
-
-    	cout <<"DATO X EN STRUC 4999 PRUEBA:"<< coordenada[4999].x << endl;
-        cout <<"DATO Y EN STRUC 9 PRUEBA:"<< coordenada[9].y << endl;
-        cout <<"DATO X EN STRUC 3 PRUEBA:"<< coordenada[3].x << endl;
-        cout<<"el triangulo tiene: "<<leer_triangulo(argv[2])<<" lineas"<<endl;
+      leer_triangulo(argv[2]);
+      cout<<"triangulo 0 a: "<<triangulos[0].a<<endl;
+      cout<<"El perimetro del triangulo 0 es: "<<calcular_perimetro(triangulos[1])<<endl;
     }
     return 0;
 }
