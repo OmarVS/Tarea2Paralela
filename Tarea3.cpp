@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <cstring>
 #include <math.h>
+#include "mpi.h"
 
 using namespace std;
 
@@ -106,7 +107,7 @@ int leer_coordenadas(cadena archivo)
            	cout<<"Leyendo el fichero..."<<endl;
 
            	while(!fs.eof())
-	        {
+	          {
               int cont2=0;
            		//cont++;
            		fs.getline(string,30,'\n');
@@ -135,6 +136,10 @@ int leer_coordenadas(cadena archivo)
 
 int main(int argc, char *argv[])
 {
+  int status, my_rank, cant;  /* Valor de retorno, id, cant */
+  int limites[2],valor;
+  double acum=0;
+  MPI_Status rec_stat; /* Status object*/
 
     if(argc<2)    cout<<"Ingrese la ruta del archivo como argumento. Ejemplo: \"./tarea1 numeros.csv\""<<endl;
     else{
@@ -142,6 +147,28 @@ int main(int argc, char *argv[])
       leer_triangulo(argv[2]);
       cout<<"triangulo 0 a: "<<triangulos[0].a<<endl;
       cout<<"El perimetro del triangulo 0 es: "<<calcular_perimetro(triangulos[1])<<endl;
+
+      valor=(leer_triangulo(argv[2])/cant)+1;
+      if(my_rank==0){
+        for(int i=0; i<cant; i++)
+        {
+          limites[0] = valor*i;
+          limites[1] = (valor*(i+1))-1;
+          status = MPI_Send(limites, 2, MPI_INT, i, 0, MPI_COMM_WORLD);
+        }
+        status = MPI_Recv(limites, 2, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &rec_stat);
+        for(int i=limites[0];i<=limites[1];i++){
+          acum+=calcular_perimetro(triangulos[i]);
+        }
+        cout<<"Perímetro Rank 0: "<<acum<<endl;
+      }
+      else{
+        status = MPI_Recv(limites, 2, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &rec_stat);
+        for(int i=limites[0];i<=limites[1];i++){
+          acum+=calcular_perimetro(triangulos[i]);
+        }
+        cout<<"Perímetro Rank "<<my_rank<<": "<<acum<<endl;
+      }
     }
     return 0;
 }
