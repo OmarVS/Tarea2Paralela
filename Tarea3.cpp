@@ -63,7 +63,7 @@ int leer_triangulo(cadena archivo){
         else {
 	        long long cont=0;
            	cadena string;
-           	cout<<"Leyendo el fichero..."<<endl;
+           	cout<<"Leyendo el fichero de triangulos..."<<endl;
 
            	while(!fs.eof())
 	        {
@@ -91,7 +91,7 @@ int leer_triangulo(cadena archivo){
                    }
                 		cont++;
            	}
-            cout<<"triangulo a:"<<triangulos[1].a<<endl;
+            //cout<<"triangulo a:"<<triangulos[1].a<<endl;
             return cont-1;
         }
 }
@@ -104,7 +104,7 @@ void leer_coordenadas(cadena archivo)
         else {
 	        long long cont=0;
            	cadena string;
-           	cout<<"Leyendo el fichero..."<<endl;
+           	cout<<"Leyendo el fichero de puntos..."<<endl;
 
            	while(!fs.eof())
 	          {
@@ -130,26 +130,30 @@ void leer_coordenadas(cadena archivo)
                    }
                    cont++;
            	}
-           	//return cont-1;
         }
 }
 
 int main(int argc, char *argv[])
 {
+  cout.precision(10);
   int status, my_rank, cant;  /* Valor de retorno, id, cant */
   int limites[2],valor;
-  double acum=0;
+  float acum=0, total = 0;
   MPI_Status rec_stat; /* Status object*/
 
-    if(argc<2)    cout<<"Ingrese la ruta del archivo como argumento. Ejemplo: \"./tarea1 numeros.csv\""<<endl;
-    else{
-      /*cout<<"el archivo tiene: "<<leer_coordenadas(argv[1])<<" lineas"<<endl;
-      leer_triangulo(argv[2]);
-      cout<<"triangulo 0 a: "<<triangulos[0].a<<endl;
-      cout<<"El perimetro del triangulo 0 es: "<<calcular_perimetro(triangulos[1])<<endl;*/
-      leer_coordenadas(argv[1]);
+  leer_coordenadas(argv[1]);
 
-      valor=(leer_triangulo(argv[2])/cant)+1;
+  valor=leer_triangulo(argv[2]);
+
+  MPI_Init(&argc, &argv); /* Inicio de MPI */
+  MPI_Comm_size(MPI_COMM_WORLD, &cant);      /* numero de procesos */
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); /* rango de procesos  */
+
+  valor = (valor/cant)+1;
+
+    if(argc<2)    cout<<"Ingrese la ruta de los archivos como argumento. Ejemplo: \"./tarea3 puntos triangulos\""<<endl;
+
+    else{
 
       if(my_rank==0){
         for(int i=0; i<cant; i++)
@@ -159,17 +163,25 @@ int main(int argc, char *argv[])
           status = MPI_Send(limites, 2, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
         status = MPI_Recv(limites, 2, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &rec_stat);
+
         for(int i=limites[0];i<=limites[1];i++){
           acum+=calcular_perimetro(triangulos[i]);
         }
-        cout<<"Perímetro Rank 0: "<<acum<<endl;
+
+        MPI_Reduce(&acum, &total, 1, MPI_FLOAT, MPI_SUM, 0,MPI_COMM_WORLD);
+        //cout<<"Perímetro Rank 0: "<<acum<<endl;
+        cout<<"La suma de todos los perimetros es: "<<total<<endl;
       }
+
       else{
         status = MPI_Recv(limites, 2, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &rec_stat);
+
         for(int i=limites[0];i<=limites[1];i++){
           acum+=calcular_perimetro(triangulos[i]);
         }
-        cout<<"Perímetro Rank "<<my_rank<<": "<<acum<<endl;
+        
+        MPI_Reduce(&acum, &total, 1, MPI_FLOAT, MPI_SUM, 0,MPI_COMM_WORLD);
+        //cout<<"Perímetro Rank "<<my_rank<<": "<<acum<<endl;
       }
     }
     MPI_Finalize();
