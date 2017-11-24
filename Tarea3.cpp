@@ -96,7 +96,7 @@ int leer_triangulo(cadena archivo){
         }
 }
 
-int leer_coordenadas(cadena archivo)
+void leer_coordenadas(cadena archivo)
 {
 	ifstream fs;
         fs.open(archivo);
@@ -130,7 +130,7 @@ int leer_coordenadas(cadena archivo)
                    }
                    cont++;
            	}
-           	return cont-1;
+           	//return cont-1;
         }
 }
 
@@ -143,12 +143,14 @@ int main(int argc, char *argv[])
 
     if(argc<2)    cout<<"Ingrese la ruta del archivo como argumento. Ejemplo: \"./tarea1 numeros.csv\""<<endl;
     else{
-    	cout<<"el archivo tiene: "<<leer_coordenadas(argv[1])<<" lineas"<<endl;
+      /*cout<<"el archivo tiene: "<<leer_coordenadas(argv[1])<<" lineas"<<endl;
       leer_triangulo(argv[2]);
       cout<<"triangulo 0 a: "<<triangulos[0].a<<endl;
-      cout<<"El perimetro del triangulo 0 es: "<<calcular_perimetro(triangulos[1])<<endl;
+      cout<<"El perimetro del triangulo 0 es: "<<calcular_perimetro(triangulos[1])<<endl;*/
+      leer_coordenadas(argv[1]);
 
       valor=(leer_triangulo(argv[2])/cant)+1;
+
       if(my_rank==0){
         for(int i=0; i<cant; i++)
         {
@@ -170,5 +172,6 @@ int main(int argc, char *argv[])
         cout<<"Perímetro Rank "<<my_rank<<": "<<acum<<endl;
       }
     }
+    MPI_Finalize();
     return 0;
 }
