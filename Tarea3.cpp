@@ -68,7 +68,6 @@ int leer_triangulo(cadena archivo){
            	while(!fs.eof())
 	        {
               int cont2=0;
-              //cont++;
            		fs.getline(string,30,'\n');
            		//cout<<"Dato sin separar: "<<string<<endl;
            		ptr = strtok(string," ");
@@ -91,7 +90,6 @@ int leer_triangulo(cadena archivo){
                    }
                 		cont++;
            	}
-            //cout<<"triangulo a:"<<triangulos[1].a<<endl;
             return cont-1;
         }
 }
@@ -109,7 +107,6 @@ void leer_coordenadas(cadena archivo)
            	while(!fs.eof())
 	          {
               int cont2=0;
-           		//cont++;
            		fs.getline(string,30,'\n');
            		//cout<<"Dato sin separar: "<<string<<endl;
            		ptr = strtok(string," ");
@@ -141,10 +138,6 @@ int main(int argc, char *argv[])
   float acum=0, total = 0;
   MPI_Status rec_stat; /* Status object*/
 
-  leer_coordenadas(argv[1]);
-
-  valor=leer_triangulo(argv[2]);
-
   MPI_Init(&argc, &argv); /* Inicio de MPI */
   MPI_Comm_size(MPI_COMM_WORLD, &cant);      /* numero de procesos */
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); /* rango de procesos  */
@@ -156,6 +149,11 @@ int main(int argc, char *argv[])
     else{
 
       if(my_rank==0){
+      	
+      	leer_coordenadas(argv[1]);
+
+  		valor=leer_triangulo(argv[2]);
+
         for(int i=0; i<cant; i++)
         {
           limites[0] = valor*i;
@@ -169,7 +167,6 @@ int main(int argc, char *argv[])
         }
 
         MPI_Reduce(&acum, &total, 1, MPI_FLOAT, MPI_SUM, 0,MPI_COMM_WORLD);
-        //cout<<"Perímetro Rank 0: "<<acum<<endl;
         cout<<"La suma de todos los perimetros es: "<<total<<endl;
       }
 
@@ -181,7 +178,6 @@ int main(int argc, char *argv[])
         }
         
         MPI_Reduce(&acum, &total, 1, MPI_FLOAT, MPI_SUM, 0,MPI_COMM_WORLD);
-        //cout<<"Perímetro Rank "<<my_rank<<": "<<acum<<endl;
       }
     }
     MPI_Finalize();
