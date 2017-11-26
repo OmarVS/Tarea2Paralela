@@ -63,7 +63,6 @@ int leer_triangulo(cadena archivo){
         else {
 	        long long cont=0;
            	cadena string;
-           	cout<<"Leyendo el fichero de triangulos..."<<endl;
 
            	while(!fs.eof())
 	        {
@@ -102,7 +101,6 @@ void leer_coordenadas(cadena archivo)
         else {
 	        long long cont=0;
            	cadena string;
-           	cout<<"Leyendo el fichero de puntos..."<<endl;
 
            	while(!fs.eof())
 	          {
@@ -138,6 +136,10 @@ int main(int argc, char *argv[])
   float acum=0, total = 0;
   MPI_Status rec_stat; /* Status object*/
 
+  leer_coordenadas(argv[1]);
+
+  valor=leer_triangulo(argv[2]);
+
   MPI_Init(&argc, &argv); /* Inicio de MPI */
   MPI_Comm_size(MPI_COMM_WORLD, &cant);      /* numero de procesos */
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); /* rango de procesos  */
@@ -150,11 +152,7 @@ int main(int argc, char *argv[])
 
       if(my_rank==0){
       	
-      	leer_coordenadas(argv[1]);
-
-  		valor=leer_triangulo(argv[2]);
-
-        for(int i=0; i<cant; i++)
+      	for(int i=0; i<cant; i++)
         {
           limites[0] = valor*i;
           limites[1] = (valor*(i+1))-1;
